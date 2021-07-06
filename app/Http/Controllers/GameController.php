@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\Field;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreGameRequest;
 
 class GameController extends Controller
 {
@@ -14,7 +15,7 @@ class GameController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreGameRequest $request)
     {
         $validated = $request->validated();
 
