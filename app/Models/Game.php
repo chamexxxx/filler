@@ -17,4 +17,12 @@ class Game extends Model
     {
         return $this->hasOne(Field::class);
     }
+
+    /**
+     * Get the players for the game.
+     */
+    public function players()
+    {
+        return $this->hasMany(Player::class);
+    }
 }

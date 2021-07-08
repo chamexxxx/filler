@@ -30,4 +30,12 @@ class Field extends Model
     {
         return $this->belongsTo(Game::class);
     }
+
+    /**
+     * Get the cells for the field.
+     */
+    public function cells()
+    {
+        return $this->hasMany(Cell::class);
+    }
 }
