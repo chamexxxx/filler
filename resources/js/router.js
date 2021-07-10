@@ -6,7 +6,18 @@ import Game from "./pages/Game.vue";
 
 Vue.use(VueRouter);
 
-const routes = [];
+const routes = [
+    {
+        path: "/",
+        name: "Start",
+        component: Start
+    },
+    {
+        path: "/:gameId",
+        name: "Game",
+        component: Game
+    }
+];
 
 const router = new VueRouter({
     mode: "history",
