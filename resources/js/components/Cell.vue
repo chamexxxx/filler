@@ -27,7 +27,6 @@ export default {
 $cell-size: 15px
 
 .cell
-    display: inline-block
     width: 0
     height: 0
     margin: 3px 6px
