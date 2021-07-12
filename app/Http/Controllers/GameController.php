@@ -49,7 +49,7 @@ class GameController extends Controller
      */
     public function show(Game $game)
     {
-        return $game->load('field');
+        return $game->load('field', 'cells', 'players');
     }
 
     /**
