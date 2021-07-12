@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 use App\Models\Concerns\UsesUUID;
 
-class Game extends Model
+class Game extends BaseModel
 {
     use HasFactory, UsesUUID;
 
