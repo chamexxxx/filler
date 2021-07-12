@@ -16,7 +16,7 @@ class CreateCellsTable extends Migration
         Schema::create('cells', function (Blueprint $table) {
             $table->foreignId('field_id')->constrained();
             $table->enum('color', ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white']);
-            $table->enum('playerId', [0, 1, 2]);
+            $table->enum('playerId', [0, 1, 2])->default(0);
         });
     }
 

@@ -14,7 +14,14 @@ class Field extends Model
      *
      * @var array
      */
-    protected $fillable = ["width", "height"];
+    protected $fillable = ['width', 'height'];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = ['id', 'game_id'];
 
     /**
      * Indicates if the model should be timestamped.

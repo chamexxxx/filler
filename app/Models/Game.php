@@ -11,11 +11,26 @@ class Game extends Model
     use HasFactory, UsesUUID;
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = ['created_at', 'updated_at'];
+
+    /**
      * Get the field associated with the game.
      */
     public function field()
     {
         return $this->hasOne(Field::class);
+    }
+
+    /**
+     * Get all of the cells for the game.
+     */
+    public function cells()
+    {
+        return $this->hasManyThrough(Cell::class, Field::class);
     }
 
     /**
