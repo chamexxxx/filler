@@ -7,7 +7,7 @@
             style="margin: 6px"
             :style="
                 (index + 1) % 2 === 0 &&
-                    'margin-left: 26px; margin-top: -22px; margin-bottom: -22px;'
+                    'margin-left: 27px; margin-top: -21px; margin-bottom: -21px;'
             "
         />
     </div>
