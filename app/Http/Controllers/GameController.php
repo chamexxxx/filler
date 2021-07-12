@@ -8,6 +8,7 @@ use App\Models\Cell;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreGameRequest;
 use App\Services\Field as FieldService;
+use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
 {
@@ -29,14 +30,12 @@ class GameController extends Controller
         $game->save();
         $game->field()->save($field);
 
-        $cells = FieldService::generate($validated['width'], $validated['height'], function ($color) {
-            $cell = new Cell;
-            $cell->color = $color;
-
-            return $cell;
+        $cells = FieldService::generate($validated['width'], $validated['height'], function ($color) use ($field) {
+            return ['color' => $color, 'field_id' => $field->id];
         });
 
-        $field->cells()->saveMany($cells);
+
+        DB::table('cells')->insert($cells);
 
         return $game->only(['id']);
     }
