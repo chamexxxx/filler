@@ -8,18 +8,22 @@ class Field
 
     public static function generate(int $width, int $height, callable $callback): array
     {
+        $count = self::count($width, $height);
         $cells = [];
 
-        for ($row = 1; $row <= $height; $row++) {
-            $rowWidth = $row % 2 !== 0 ? $width : $width - 1;
-
-            for ($column = 1; $column <= $rowWidth; $column++) {
-                $cell = call_user_func($callback, self::getRandomColor());
-                array_push($cells, $cell);
-            }
+        for ($index = 0; $index < $count; $index++) {
+            $cells[] = call_user_func($callback, self::getRandomColor());
         }
 
         return $cells;
+    }
+
+    public static function count(int $width, int $height): int
+    {
+        $even = floor($height / 2);
+        $uneven = $height - $even;
+
+        return $even * ($width - 1) + $uneven * $width;
     }
 
     public static function getRandomColor()
