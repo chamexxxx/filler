@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\Field;
 use App\Models\Player;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreGameRequest;
+use App\Http\Requests\UpdateGameRequest;
 use App\Services\Filler\Field as Filler;
 use Illuminate\Support\Facades\DB;
 
@@ -73,8 +73,41 @@ class GameController extends Controller
      * @param  \App\Models\Game  $game
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Game $game)
+    public function update(UpdateGameRequest $request, Game $game)
     {
-        //
+        $validated = $request->validated();
+
+        $playerId = $validated['playerId'];
+        $color = $validated['color'];
+
+        if ($playerId !== $game->currentPlayerId) {
+            return response('The player with the specified number cannot move now', 403);
+        }
+
+        $field = $game->field;
+
+        $cells = $field->cells->map(function ($item) {
+            $item->makeVisible('id');
+            return $item;
+        })->toArray();
+
+        $filler = new Filler($field->width, $field->height, $cells);
+
+        if (!$filler->step($color, $playerId)) {
+            return response('The player with the specified number cannot select the specified color', 409);
+        }
+
+        $filler->each(function ($cell) {
+            DB::table('cells')
+                ->where('id', $cell->id)
+                ->update([
+                    'color'     => $cell->color,
+                    'player_id' => $cell->playerNumber,
+                ]);
+        });
+
+        $game->currentPlayerId = $playerId === 1 ? 2 : 1;
+
+        $game->save();
     }
 }

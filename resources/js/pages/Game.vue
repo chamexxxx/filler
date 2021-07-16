@@ -28,12 +28,17 @@ export default {
         };
     },
     methods: {
-        onSelected(color, player) {},
-        fetchGameData(id) {
+        onSelected(color, playerId) {
+            this.updateGame(color, playerId).then(this.fetchGameData);
+        },
+        updateGame(color, playerId) {
+            return axios.patch(`api/game/${this.gameId}`, { color, playerId });
+        },
+        fetchGameData() {
             this.isLoading = true;
 
             axios
-                .get(`api/game/${id}`)
+                .get(`api/game/${this.gameId}`)
                 .then(response => {
                     this.gameData = response.data;
                 })
@@ -41,6 +46,9 @@ export default {
         }
     },
     computed: {
+        gameId() {
+            return this.$route.params.gameId;
+        },
         rows() {
             if (!this.gameData) return [];
 
@@ -71,8 +79,7 @@ export default {
         }
     },
     created() {
-        const { gameId } = this.$route.params;
-        this.fetchGameData(gameId);
+        this.fetchGameData();
     }
 };
 </script>
