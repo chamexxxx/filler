@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\Field;
-use App\Models\Cell;
+use App\Models\Player;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreGameRequest;
-use App\Services\Field as FieldService;
+use App\Services\Filler\Field as Filler;
 use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
@@ -30,10 +30,25 @@ class GameController extends Controller
         $game->save();
         $game->field()->save($field);
 
-        $cells = FieldService::generate($validated['width'], $validated['height'], function ($color) use ($field) {
-            return ['color' => $color, 'field_id' => $field->id];
-        });
+        $filler = new Filler($validated['width'], $validated['height']);
 
+        $game->players()->saveMany([
+            new Player([
+                'id'      => 1,
+                'game_id' => $game->id,
+                'color'   => $filler->getCurrentColor(1)
+            ]),
+            new Player([
+                'id'      => 2,
+                'game_id' => $game->id,
+                'color'   => $filler->getCurrentColor(2)
+            ]),
+        ]);
+
+        $cells = $filler->toArray(
+            ['playerNumber' => 'player_id'],
+            ['field_id' => $field->id]
+        );
 
         DB::table('cells')->insert($cells);
 
