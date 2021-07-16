@@ -15,8 +15,8 @@ class CreateGamesTable extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('current_player_id', [0, 1, 2])->default(1);
-            $table->enum('winner_player_id', [0, 1, 2])->default(0);
+            $table->unsignedTinyInteger('current_player_id')->default(1);
+            $table->unsignedTinyInteger('winner_player_id')->default(0);
             $table->timestamps();
         });
     }

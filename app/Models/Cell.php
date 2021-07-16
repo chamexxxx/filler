@@ -14,7 +14,7 @@ class Cell extends BaseModel
      *
      * @var array
      */
-    protected $hidden = ['field_id', 'laravel_through_key'];
+    protected $hidden = ['id', 'field_id', 'laravel_through_key'];
 
     /**
      * Indicates if the model should be timestamped.

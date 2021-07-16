@@ -14,9 +14,10 @@ class CreateCellsTable extends Migration
     public function up()
     {
         Schema::create('cells', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('field_id')->constrained();
-            $table->enum('color', ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white']);
-            $table->enum('playerId', [0, 1, 2])->default(0);
+            $table->enum('color', config('constants.colors'));
+            $table->unsignedTinyInteger('player_id')->default(0);
         });
     }
 

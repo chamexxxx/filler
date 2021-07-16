@@ -10,6 +10,20 @@ class Player extends BaseModel
     use HasFactory;
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['id', 'game_id', 'color'];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = ['game_id'];
+
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool

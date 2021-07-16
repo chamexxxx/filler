@@ -14,10 +14,10 @@ class CreatePlayersTable extends Migration
     public function up()
     {
         Schema::create('players', function (Blueprint $table) {
-            $table->enum('id', [1, 2]);
+            $table->unsignedTinyInteger('id');
             $table->uuid('game_id');
             $table->foreign('game_id')->references('id')->on('games');
-            $table->enum('color', ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white']);
+            $table->enum('color', config('constants.colors'));
         });
     }
 
