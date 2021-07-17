@@ -84,6 +84,25 @@ class Field
     }
 
     /**
+     * Checks if all cells satisfy the condition given in the passed function
+     *
+     * @param callable $callback
+     * @return bool
+     */
+    public function every(callable $callback): bool
+    {
+        foreach ($this->cells as $row) {
+            foreach ($row as $cell) {
+                if (!call_user_func($callback, $cell)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Convert all cells to a new array of elements by executing a function for each element
      *
      * @param callable $callback
@@ -171,6 +190,30 @@ class Field
     }
 
     /**
+     * Checks if the game is over
+     *
+     * @return bool
+     */
+    public function isGameOver(): bool
+    {
+        return $this->every(function ($cell) {
+            return $cell->playerNumber !== 0;
+        });
+    }
+
+    /**
+     * Get the winner of the game for the current state of the field
+     *
+     * @return int
+     */
+    public function getWinner(): int
+    {
+        $numbers = $this->getNumberOfCells();
+
+        return $numbers[1] > $numbers[2] ? 1 : 2;
+    }
+
+    /**
      * Make a move in the game
      *
      * @param string $color
@@ -179,7 +222,7 @@ class Field
      */
     public function step(string $color, int $playerNumber): bool
     {
-        if (!$this->isStepAllowed($color)) {
+        if (!$this->isStepAllowed($color) || $this->isGameOver()) {
             return false;
         }
 
@@ -376,6 +419,30 @@ class Field
     private function isStepAllowed(string $color): bool
     {
         return !in_array($color, $this->currentColors);
+    }
+
+    /**
+     * Get the number of cells for each player
+     *
+     * @return array
+     */
+    private function getNumberOfCells(): array
+    {
+        $numberOfFreeSlots = 0;
+        $numberOfSlotsForTheFirstPlayer = 0;
+        $numberOfSlotsForTheSecondPlayer = 0;
+
+        $this->each(function ($cell) use (&$numberOfFreeSlots, &$numberOfSlotsForTheFirstPlayer, &$numberOfSlotsForTheSecondPlayer) {
+            if ($cell->playerNumber === 1) {
+                $numberOfSlotsForTheFirstPlayer++;
+            } else if ($cell->playerNumber === 2) {
+                $numberOfSlotsForTheSecondPlayer++;
+            } else {
+                $numberOfFreeSlots++;
+            }
+        });
+
+        return [$numberOfFreeSlots, $numberOfSlotsForTheFirstPlayer, $numberOfSlotsForTheSecondPlayer];
     }
 
     /**

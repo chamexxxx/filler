@@ -93,8 +93,13 @@ class GameController extends Controller
 
         $filler = new Filler($field->width, $field->height, $cells);
 
-        if (!$filler->step($color, $playerId)) {
+        $stepResult = $filler->step($color, $playerId);
+        $gameOver = $filler->isGameOver();
+
+        if (!$stepResult && !$gameOver) {
             return response('The player with the specified number cannot select the specified color', 409);
+        } else if ($gameOver) {
+            $game->winnerPlayerId = $filler->getWinner();
         }
 
         $filler->each(function ($cell) {
@@ -106,7 +111,7 @@ class GameController extends Controller
                 ]);
         });
 
-        $game->currentPlayerId = $playerId === 1 ? 2 : 1;
+        $game->currentPlayerId = $gameOver ? 0 : ($playerId === 1 ? 2 : 1);
 
         $game->save();
     }
