@@ -16,14 +16,14 @@ class Cell
 
     private $field;
 
-    public function __construct(int $row, int $column, string $color, int $playerNumber, int $id = null, Field &$field)
+    public function __construct(Field &$field, int $row, int $column, string $color, int $playerNumber, int $id = null)
     {
+        $this->field = $field;
         $this->row = $row;
         $this->column = $column;
         $this->color = $color;
         $this->playerNumber = $playerNumber;
         $this->id = $id;
-        $this->field = $field;
     }
 
     public function getLeftCell(): ?Cell
@@ -68,15 +68,5 @@ class Cell
     {
         $column = $this->row % 2 === 0 ? $this->column + 1 : $this->column;
         return $this->field->getCell($this->row + 1, $column);
-    }
-
-    public function getRelativeTopCell(): ?Cell
-    {
-        return $this->field->getCell($this->row - 1, $this->column);
-    }
-
-    public function getRelativeBottomCell(): ?Cell
-    {
-        return $this->field->getCell($this->row + 1, $this->column);
     }
 }

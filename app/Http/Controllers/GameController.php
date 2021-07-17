@@ -15,7 +15,7 @@ class GameController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreGameRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreGameRequest $request)
@@ -69,8 +69,8 @@ class GameController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Game  $game
+     * @param UpdateGameRequest $request
+     * @param \App\Models\Game $game
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateGameRequest $request, Game $game)

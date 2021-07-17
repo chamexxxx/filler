@@ -54,8 +54,8 @@ class Field
      *
      * @param integer $width
      * @param integer $height
-     * @param array $cells
-     * @param array $currentColors
+     * @param array|null $cells
+     * @param array|null $currentColors
      */
     public function __construct(int $width, int $height, array $cells = null, array $currentColors = null)
     {
@@ -103,8 +103,8 @@ class Field
     /**
      * Convert all cells to array of elements
      *
-     * @param array $renamedProperties Properties for renaming
-     * @param array $additionalProperties Properties to add
+     * @param array|null $renamedProperties Properties for renaming
+     * @param array|null $additionalProperties Properties to add
      * @return array
      */
     public function toArray(array $renamedProperties = null, array $additionalProperties = null): array
@@ -179,16 +179,13 @@ class Field
      */
     public function step(string $color, int $playerNumber): bool
     {
-        if (!$this->isStepAllowed($color, $playerNumber)) {
+        if (!$this->isStepAllowed($color)) {
             return false;
         }
 
         $this->currentPlayerNumber = $playerNumber;
 
         $startingCell = $this->getStartingCell($playerNumber);
-
-        // $currentColor = $this->getCurrentColor($playerNumber);
-        // $startingCell->color = $color;
 
         $cluster = $this->getCluster($startingCell, function ($cell) use ($color, $playerNumber) {
             if ($cell->color === $color) {
@@ -220,7 +217,7 @@ class Field
      * Get a group of cells merged with one color relative to a given cell
      *
      * @param Cell $cell Cell relative to which the search will be conducted
-     * @param callable $extremeCallback Called when the outermost cells do not match the color
+     * @param callable|null $extremeCallback Called when the outermost cells do not match the color
      * @return array
      */
     private function getCluster(Cell $cell, callable $extremeCallback = null): array
@@ -239,9 +236,9 @@ class Field
      *
      * @param Cell $cell Cell relative to which the search will be conducted
      * @param callable $callback Called when a neighbor is found
-     * @param callable $extremeCallback Called when the outermost cells do not match the color
-     * @param string $color Color for which to count neighbors
-     * @param string $direction Direction to search for next cell
+     * @param callable|null $extremeCallback Called when the outermost cells do not match the color
+     * @param string|null $color Color for which to count neighbors
+     * @param string|null $direction Direction to search for next cell
      * @param array $cells Additional array to exclude repetitions
      * @return void
      */
@@ -374,7 +371,6 @@ class Field
      * Check if it is allowed to make a move in the game
      *
      * @param string $color
-     * @param integer $playerNumber
      * @return boolean
      */
     private function isStepAllowed(string $color): bool
@@ -394,12 +390,12 @@ class Field
             $item = $cells[$index];
 
             $this->cells[$row][$column] = new Cell(
+                $this,
                 $row,
                 $column,
                 $item['color'],
                 $item['playerId'],
                 $item['id'],
-                $this
             );
         });
     }
@@ -413,12 +409,12 @@ class Field
     {
         $this->iterate(function ($row, $column) {
             $this->cells[$row][$column] = new Cell(
+                $this,
                 $row,
                 $column,
                 self::getRandomColor(),
                 0,
                 null,
-                $this
             );
         });
     }
