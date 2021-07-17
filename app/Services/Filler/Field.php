@@ -232,7 +232,11 @@ class Field
 
         $cluster = $this->getCluster($startingCell, function ($cell) use ($color, $playerNumber) {
             if ($cell->color === $color) {
-                $cell->playerNumber = $playerNumber;
+                $cluster = $this->getCluster($cell);
+
+                foreach ($cluster as $cell) {
+                    $cell->playerNumber = $playerNumber;
+                }
             }
         });
 
