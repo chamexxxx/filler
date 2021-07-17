@@ -318,7 +318,7 @@ class Field
 
             $cells[] = $nextCell;
 
-            $directions = $this->getValidDirectionsForPlayer($direction, $this->currentPlayerNumber);
+            $directions = $this->getValidDirections($direction);
 
             foreach ($directions as $direction) {
                 $this->getAllNeighbors($nextCell, $callback, $extremeCallback, $color, $direction, $cells);
@@ -356,21 +356,6 @@ class Field
     private function getNeighbor(Cell $cell, string $direction): ?Cell
     {
         return $cell->{'get' . $direction . 'Cell'}();
-    }
-
-    /**
-     * Get all directions except opposite and reverse to the starting position
-     *
-     * @param string $direction
-     * @param integer $playerNumber
-     * @return array
-     */
-    private function getValidDirectionsForPlayer(string $direction, int $playerNumber): array
-    {
-        return array_diff(
-            $this->getValidDirections($direction),
-            [$playerNumber === 1 ? 'BottomLeft' : 'TopRight']
-        );
     }
 
     /**
