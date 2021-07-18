@@ -111,6 +111,11 @@ class GameController extends Controller
                 ]);
         });
 
+        DB::table('players')
+            ->where('game_id', $game->id)
+            ->where('id', $playerId)
+            ->update(['color' => $color]);
+
         $game->currentPlayerId = $gameOver ? 0 : ($playerId === 1 ? 2 : 1);
 
         $game->save();
