@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="my-5 p-3" style="background: #121212; border: 3px solid white; border-radius: 7px;">
         <row
             v-for="(row, index) in rows"
             :key="index"

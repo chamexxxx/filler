@@ -1,8 +1,19 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
+// A modern alternative to CSS resets
+@import '~normalize.css';
+
 // Variables
 @import 'variables';
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+.bg-light-image {
+    background: url('/img/bg-light-4812.png')
+}
+
+.bg-dark-image {
+    background: url('/img/bg-dark-4800.png')
+}

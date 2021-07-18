@@ -1,16 +1,26 @@
 <template>
-    <div class="d-flex flex-column justify-center items-center">
-        <template v-if="!isLoading && rows.length > 0">
-            <control-panel @selected="onSelected($event, 2)" />
-            <field :rows="rows" class="p-5" />
-            <control-panel @selected="onSelected($event, 1)" />
-        </template>
-        <span
-            v-else
-            class="spinner-grow spinner-grow-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
+    <div class="d-flex flex-column justify-content-center align-items-center min-vh-100 min-vw-100 bg-dark-image">
+        <div>
+            <template v-if="!isLoading && rows.length > 0">
+                <div class="d-flex justify-content-between align-items-center px-3">
+                    <span class="mr-3 lead text-white">0%</span>
+                    <control-panel class="flex-grow-1" @selected="onSelected($event, 2)" />
+                </div>
+
+                <field :rows="rows" />
+
+                <div class="d-flex justify-content-between align-items-center px-3">
+                    <control-panel class="flex-grow-1" @selected="onSelected($event, 1)" />
+                    <span class="lead text-white ml-3">0%</span>
+                </div>
+            </template>
+            <span
+                v-else
+                class="spinner-grow spinner-grow-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+        </div>
     </div>
 </template>
 

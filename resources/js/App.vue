@@ -1,5 +1,5 @@
 <template>
-    <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
+    <div class="position-relative d-flex justify-content-center align-items-center min-vh-100 bg-light-image">
         <router-view />
     </div>
 </template>

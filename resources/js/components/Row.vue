@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="d-flex">
         <cell v-for="(cell, index) in cells" :key="index" v-bind="cell" />
     </div>
 </template>

@@ -1,13 +1,11 @@
 <template>
-    <div class="flex justify-center">
-        <div class="flex justify-between">
-            <cell
-                v-for="color in colors"
-                :key="color"
-                :color="color"
-                @click="onClick(color)"
-            />
-        </div>
+    <div class="d-flex justify-content-around">
+        <cell
+            v-for="color in colors"
+            :key="color"
+            :color="color"
+            @click="onClick(color)"
+        />
     </div>
 </template>
 
