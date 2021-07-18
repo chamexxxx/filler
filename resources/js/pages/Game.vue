@@ -13,16 +13,17 @@
                     <control-panel class="flex-grow-1" @selected="onSelected($event, 1)" />
                     <span class="lead text-white ml-3">{{ getPlayerPercentage(1) }}%</span>
                 </div>
+
+                <div :class="`bottom-left-triangle bottom-left-triangle--${getPlayerColor(1)}`"></div>
+                <div :class="`top-right-triangle top-right-triangle--${getPlayerColor(2)}`"></div>
             </template>
             <span
                 v-else
-                class="spinner-grow spinner-grow-sm"
+                class="spinner-grow spinner-grow-sm text-light"
                 role="status"
                 aria-hidden="true"
             ></span>
         </div>
-        <div :class="`bottom-left-triangle bottom-left-triangle--${getPlayerColor(1)}`"></div>
-        <div :class="`top-right-triangle top-right-triangle--${getPlayerColor(2)}`"></div>
     </div>
 </template>
 
@@ -47,14 +48,11 @@ export default {
             return axios.patch(`api/game/${this.gameId}`, { color, playerId })
         },
         fetchGameData() {
-            this.isLoading = true;
-
-            axios
+            return axios
                 .get(`api/game/${this.gameId}`)
                 .then(response => {
                     this.gameData = response.data;
                 })
-                .finally(() => this.isLoading = false);
         },
         getPlayerColor(playerId) {
           return this.gameData ? this.gameData.players.find(({ id }) => id === playerId).color : null;
@@ -107,7 +105,8 @@ export default {
         },
     },
     created() {
-        this.fetchGameData();
+        this.isLoading = true;
+        this.fetchGameData().finally(() => this.isLoading = false);
     }
 };
 </script>

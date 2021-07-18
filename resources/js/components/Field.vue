@@ -4,11 +4,8 @@
             v-for="(row, index) in rows"
             :key="index"
             :cells="row"
-            style="margin: 6px"
-            :style="
-                (index + 1) % 2 === 0 &&
-                    'margin-left: 27px; margin-top: -21px; margin-bottom: -21px;'
-            "
+            class="row"
+            :class="{ 'even-row': (index + 1) % 2 === 0 }"
         />
     </div>
 </template>
@@ -30,3 +27,13 @@ export default {
     }
 };
 </script>
+
+<style lang="sass">
+.row
+    margin: 6px
+
+.even-row
+    margin-left: 27px
+    margin-top: -21px
+    margin-bottom: -21px
+</style>
