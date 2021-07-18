@@ -3,7 +3,7 @@
         <div>
             <template v-if="!isLoading && rows.length > 0">
                 <div class="d-flex justify-content-between align-items-center px-3">
-                    <span class="mr-3 lead text-white">0%</span>
+                    <span class="mr-3 lead text-white">{{ getPlayerPercentage(2) }}%</span>
                     <control-panel class="flex-grow-1" @selected="onSelected($event, 2)" />
                 </div>
 
@@ -11,7 +11,7 @@
 
                 <div class="d-flex justify-content-between align-items-center px-3">
                     <control-panel class="flex-grow-1" @selected="onSelected($event, 1)" />
-                    <span class="lead text-white ml-3">0%</span>
+                    <span class="lead text-white ml-3">{{ getPlayerPercentage(1) }}%</span>
                 </div>
             </template>
             <span
@@ -59,6 +59,19 @@ export default {
         getPlayerColor(playerId) {
           return this.gameData ? this.gameData.players.find(({ id }) => id === playerId).color : null;
         },
+        getPlayerPercentage(playerId) {
+            if (!this.gameData) return null;
+
+            const cells = this.gameData.cells;
+
+            const count =  cells.reduce((count, cell) => {
+                if (cell.playerId === playerId) count++;
+
+                return count;
+            }, 0);
+
+            return Math.floor(count / cells.length * 100);
+        }
     },
     computed: {
         gameId() {
