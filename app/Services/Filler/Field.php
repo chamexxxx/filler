@@ -14,8 +14,6 @@ class Field
 
     private $currentColors = [];
 
-    private $currentPlayerNumber = 1;
-
     private const COLORS = ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white'];
 
     /**
@@ -27,11 +25,22 @@ class Field
     /**
      * Getting a random color
      *
+     * @param string|null $excludedColor
      * @return string
      */
-    public static function getRandomColor(): string
+    public static function getRandomColor(string $excludedColor = null): string
     {
-        return self::COLORS[array_rand(self::COLORS)];
+        $colors = self::COLORS;
+
+        if ($excludedColor) {
+            $index = array_search($excludedColor, $colors);
+
+            if ($index !== false) {
+                $colors = array_diff($colors, [$excludedColor]);
+            }
+        }
+
+        return $colors[array_rand($colors)];
     }
 
     /**
@@ -464,16 +473,22 @@ class Field
     private function generate()
     {
         $this->iterate(function ($row, $column) {
+            $color = $row === $this->height && $column === 1 ?
+                self::getRandomColor($this->getCell(1, $this->width)->color) :
+                self::getRandomColor();
+
             $this->cells[$row][$column] = new Cell(
                 $this,
                 $row,
                 $column,
-                self::getRandomColor(),
+                $color,
                 0,
                 null,
             );
         });
     }
+
+
 
     /**
      * Iterate cells by executing a function for each element using the width and height of the field
