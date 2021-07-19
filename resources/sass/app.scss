@@ -10,6 +10,16 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
+.bg-blackout {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.7);
+}
+
 .bg-light-image {
     background: url('/img/bg-light-4812.png')
 }

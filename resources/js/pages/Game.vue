@@ -1,13 +1,28 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-center align-items-center min-vh-100 min-vw-100 bg-dark-image">
         <div>
-            <template v-if="!isLoading && rows.length > 0">
+            <span
+                v-if="isLoading"
+                class="spinner-grow spinner-grow-sm text-light"
+                role="status"
+                aria-hidden="true"
+            />
+            <template v-else-if="rows.length > 0">
                 <div class="d-flex justify-content-between align-items-center px-3">
                     <span class="mr-3 lead text-white">{{ getPlayerPercentage(2) }}%</span>
                     <control-panel class="flex-grow-1" @selected="onSelected($event, 2)" />
                 </div>
 
-                <field :rows="rows" />
+                <field :rows="rows">
+                    <template #default v-if="isGameOver">
+                        <h1 class="text-light">Игра закончена</h1>
+                        <h2 class="text-light">Победил игрок {{ winnerPlayerId }}</h2>
+
+                        <button @click="$router.push({ name: 'Start' })" class="btn btn-primary mt-4">
+                            Вернуться в меню
+                        </button>
+                    </template>
+                </field>
 
                 <div class="d-flex justify-content-between align-items-center px-3">
                     <control-panel class="flex-grow-1" @selected="onSelected($event, 1)" />
@@ -74,6 +89,12 @@ export default {
     computed: {
         gameId() {
             return this.$route.params.gameId;
+        },
+        isGameOver() {
+          return this.gameData && this.gameData.currentPlayerId === 0;
+        },
+        winnerPlayerId() {
+            return this.gameData && this.gameData.winnerPlayerId;
         },
         rows() {
             if (!this.gameData) return [];

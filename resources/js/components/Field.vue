@@ -1,5 +1,10 @@
 <template>
-    <div class="my-5 p-3" style="background: #121212; border: 3px solid white; border-radius: 7px;">
+    <div class="position-relative my-5 p-3" style="background: #121212; border: 3px solid white; border-radius: 7px;">
+        <template v-if="$slots.default">
+            <div class="d-flex flex-column justify-content-center align-items-center bg-blackout">
+                <slot></slot>
+            </div>
+        </template>
         <row
             v-for="(row, index) in rows"
             :key="index"
