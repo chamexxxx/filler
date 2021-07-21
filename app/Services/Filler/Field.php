@@ -4,6 +4,14 @@ namespace App\Services\Filler;
 
 class Field
 {
+    public const COLORS = ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white'];
+
+    /**
+     * The main directions of the cells
+     * Opposites are indicated through one element
+     */
+    private const DIRECTIONS = ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'];
+
     private $width;
 
     private $height;
@@ -13,14 +21,6 @@ class Field
     private $startingPositions = [];
 
     private $currentColors = [];
-
-    private const COLORS = ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white'];
-
-    /**
-     * The main directions of the cells
-     * Opposites are indicated through one element
-     */
-    private const DIRECTIONS = ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'];
 
     /**
      * Getting a random color
@@ -56,6 +56,27 @@ class Field
         $uneven = $height - $even;
 
         return $even * ($width - 1) + $uneven * $width;
+    }
+
+    /**
+     * Iterate cells by executing a function for each element using the width and height of the field
+     *
+     * @param int $width
+     * @param int $height
+     * @param callable $callback
+     * @return void
+     */
+    public static function iterate(int $width, int $height, callable $callback)
+    {
+        for ($row = 1; $row <= $height; $row++) {
+            $rowWidth = $row % 2 !== 0 ? $width : $width - 1;
+
+            for ($column = 1; $column <= $rowWidth; $column++) {
+                $index = self::count($width, $row - 1) + $column - 1;
+
+                call_user_func($callback, $row, $column, $index);
+            }
+        }
     }
 
     /**
@@ -234,8 +255,6 @@ class Field
         if (!$this->isStepAllowed($color) || $this->isGameOver()) {
             return false;
         }
-
-        $this->currentPlayerNumber = $playerNumber;
 
         $startingCell = $this->getStartingCell($playerNumber);
 
@@ -451,7 +470,7 @@ class Field
      */
     private function fill(array $cells): void
     {
-        $this->iterate(function ($row, $column, $index) use ($cells) {
+        self::iterate($this->width, $this->height, function ($row, $column, $index) use ($cells) {
             $item = $cells[$index];
 
             $this->cells[$row][$column] = new Cell(
@@ -472,7 +491,7 @@ class Field
      */
     private function generate()
     {
-        $this->iterate(function ($row, $column) {
+        self::iterate($this->width, $this->height, function ($row, $column) {
             $color = $row === $this->height && $column === 1 ?
                 self::getRandomColor($this->getCell(1, $this->width)->color) :
                 self::getRandomColor();
@@ -486,27 +505,6 @@ class Field
                 null,
             );
         });
-    }
-
-
-
-    /**
-     * Iterate cells by executing a function for each element using the width and height of the field
-     *
-     * @param callable $callback
-     * @return void
-     */
-    private function iterate(callable $callback)
-    {
-        for ($row = 1; $row <= $this->height; $row++) {
-            $width = $row % 2 !== 0 ? $this->width : $this->width - 1;
-
-            for ($column = 1; $column <= $width; $column++) {
-                $index = self::count($this->width, $row - 1) + $column - 1;
-
-                call_user_func($callback, $row, $column, $index);
-            }
-        }
     }
 
     /**
