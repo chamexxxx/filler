@@ -26,6 +26,14 @@ class Cell
         $this->id = $id;
     }
 
+    public function getPosition(): array
+    {
+        return [
+            'row'    => $this->row,
+            'column' => $this->column
+        ];
+    }
+
     public function getLeftCell(): ?Cell
     {
         return $this->field->getCell($this->row, $this->column - 1);
