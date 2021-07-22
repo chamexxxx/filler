@@ -2,17 +2,16 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\OddNumber;
 
-class StoreGameRequest extends FormRequest
+class StoreGameRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -22,7 +21,7 @@ class StoreGameRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         $fieldPropertyRule = ['required', 'numeric', 'integer', 'min:5', 'max:99', new OddNumber];
 
