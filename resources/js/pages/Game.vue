@@ -75,9 +75,9 @@ export default {
         getPlayerPercentage(playerId) {
             if (!this.gameData) return null;
 
-            const cells = this.gameData.cells;
+            const { cells } = this.gameData.field;
 
-            const count =  cells.reduce((count, cell) => {
+            const count = cells.reduce((count, cell) => {
                 if (cell.playerId === playerId) count++;
 
                 return count;
@@ -101,8 +101,8 @@ export default {
 
             const rows = [];
 
-            const { field, cells } = this.gameData || {};
-            const { width: fieldWidth, height: fieldHeight } = field;
+            const { field } = this.gameData;
+            const { width: fieldWidth, height: fieldHeight, cells } = field;
 
             for (let row = 1; row <= fieldHeight; row++) {
                 const width = row % 2 !== 0 ? fieldWidth : fieldWidth - 1;

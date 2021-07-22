@@ -16,7 +16,7 @@ class GameController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreGameRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreGameRequest $request)
     {
@@ -52,7 +52,7 @@ class GameController extends Controller
 
         DB::table('cells')->insert($cells);
 
-        return $game->only(['id']);
+        return response()->json($game->only(['id']), 201);
     }
 
     /**
@@ -63,7 +63,7 @@ class GameController extends Controller
      */
     public function show(Game $game)
     {
-        return $game->load('field', 'cells', 'players');
+        return $game->load('field', 'field.cells', 'players');
     }
 
     /**
