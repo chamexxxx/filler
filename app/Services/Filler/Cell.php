@@ -16,13 +16,13 @@ class Cell
 
     private $field;
 
-    public function __construct(Field &$field, int $row, int $column, string $color, int $playerNumber, int $id = null)
+    public function __construct(Field &$field, int $row, int $column, int $playerNumber, string $color = null, int $id = null)
     {
         $this->field = $field;
         $this->row = $row;
         $this->column = $column;
-        $this->color = $color;
         $this->playerNumber = $playerNumber;
+        $this->color = $color;
         $this->id = $id;
     }
 

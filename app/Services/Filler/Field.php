@@ -25,19 +25,15 @@ class Field
     /**
      * Getting a random color
      *
-     * @param string|null $excludedColor
+     * @param array|null $excludedColors
      * @return string
      */
-    public static function getRandomColor(string $excludedColor = null): string
+    public static function getRandomColor(array $excludedColors = null): string
     {
         $colors = self::COLORS;
 
-        if ($excludedColor) {
-            $index = array_search($excludedColor, $colors);
-
-            if ($index !== false) {
-                $colors = array_diff($colors, [$excludedColor]);
-            }
+        if ($excludedColors) {
+            $colors = array_diff($colors, $excludedColors);
         }
 
         return $colors[array_rand($colors)];
@@ -85,17 +81,22 @@ class Field
      * @param integer $width
      * @param integer $height
      * @param array|null $cells
-     * @param array|null $currentColors
      */
-    public function __construct(int $width, int $height, array $cells = null, array $currentColors = null)
+    public function __construct(int $width, int $height, array $cells = null)
     {
         $this->width = $width;
         $this->height = $height;
-        $cells ? $this->fill($cells) : $this->generate();
-        $this->initializeStartingPositions();
-        $currentColors ?
-            $this->setCurrentColors($currentColors[0], $currentColors[1]) :
-            $this->initializeCurrentColors();
+
+        if ($cells) {
+            $this->fill($cells);
+            $this->initializeStartingPositions();
+        } else {
+            $this->initializeCells();
+            $this->initializeStartingPositions();
+            $this->generateClusters();
+        }
+
+        $this->initializeCurrentColors();
     }
 
     /**
@@ -289,6 +290,74 @@ class Field
     }
 
     /**
+     * Fill the field with clusters by color
+     *
+     * @return void
+     */
+    private function generateClusters(): void
+    {
+        $startingCell = $this->getStartingCell(1);
+        $this->fillWithClusters($startingCell, self::getRandomColor());
+    }
+
+    /**
+     * Recursive function of filling all clusters by color
+     *
+     * @param Cell $cell
+     * @param string $color
+     * @param string|null $direction
+     * @param array $cells
+     * @param int $number
+     * @param int $limit
+     * @return void
+     */
+    private function fillWithClusters(
+        Cell $cell,
+        string $color,
+        string $direction = null,
+        array &$cells = [],
+        int $number = 1,
+        int &$limit = 3
+    ): void {
+        if (!$direction) {
+            foreach (self::DIRECTIONS as $direction) {
+                $this->{__FUNCTION__}($cell, $color, $direction, $cells, $number, $limit);
+            }
+        }
+
+        $exceeded = $number > $limit;
+
+        if ($exceeded) {
+            $number = 1;
+            $limit = rand(5, 7);
+        }
+
+        if ($this->isStartingCell($cell, 2)) {
+            $color = $exceeded ?
+                self::getRandomColor([$this->getStartingCell(1)->color, $color]) :
+                self::getRandomColor([$this->getStartingCell(1)->color]);
+        } else if ($exceeded) {
+            $color = self::getRandomColor([$color]);
+        }
+
+        $cell->color = $color;
+
+        $cells[] = $cell;
+
+        $nextCell = $this->getNeighbor($cell, $direction);
+
+        if ($nextCell && !$this->cellExistsInArray($nextCell, $cells)) {
+            $directions = $this->getValidDirections($direction);
+            shuffle($directions);
+
+            foreach ($directions as $direction) {
+                $number++;
+                $this->{__FUNCTION__}($nextCell, $color, $direction, $cells, $number, $limit);
+            }
+        }
+    }
+
+    /**
      * Get a group of cells merged with one color relative to a given cell
      *
      * @param Cell $cell Cell relative to which the search will be conducted
@@ -330,10 +399,9 @@ class Field
         }
 
         if (!$direction) {
-            $this->getAllNeighbors($cell, $callback, $extremeCallback, $color, 'TopLeft', $cells);
-            $this->getAllNeighbors($cell, $callback, $extremeCallback, $color, 'TopRight', $cells);
-            $this->getAllNeighbors($cell, $callback, $extremeCallback, $color, 'BottomLeft', $cells);
-            $this->getAllNeighbors($cell, $callback, $extremeCallback, $color, 'BottomRight', $cells);
+            foreach (self::DIRECTIONS as $direction) {
+                $this->{__FUNCTION__}($cell, $callback, $extremeCallback, $color, $direction, $cells);
+            }
 
             return;
         }
@@ -349,7 +417,7 @@ class Field
             $directions = $this->getValidDirections($direction);
 
             foreach ($directions as $direction) {
-                $this->getAllNeighbors($nextCell, $callback, $extremeCallback, $color, $direction, $cells);
+                $this->{__FUNCTION__}($nextCell, $callback, $extremeCallback, $color, $direction, $cells);
             }
         } else if ($nextCell && $extremeCallback) {
             call_user_func($extremeCallback, $nextCell);
@@ -477,33 +545,17 @@ class Field
                 $this,
                 $row,
                 $column,
-                $item['color'],
                 $item['playerId'],
+                $item['color'],
                 $item['id'],
             );
         });
     }
 
-    /**
-     * Generate cells by executing a function for each item
-     *
-     * @return void
-     */
-    private function generate()
+    private function initializeCells()
     {
         self::iterate($this->width, $this->height, function ($row, $column) {
-            $color = $row === $this->height && $column === 1 ?
-                self::getRandomColor($this->getCell(1, $this->width)->color) :
-                self::getRandomColor();
-
-            $this->cells[$row][$column] = new Cell(
-                $this,
-                $row,
-                $column,
-                $color,
-                0,
-                null,
-            );
+            $this->cells[$row][$column] = new Cell($this, $row, $column, 0);
         });
     }
 
@@ -525,6 +577,19 @@ class Field
                 'column' => $this->width
             ]
         );
+    }
+
+    /**
+     * Checks if the cell is the starting cell for the player
+     *
+     * @param Cell $cell
+     * @param int $playerNumber
+     * @return bool
+     */
+    private function isStartingCell(Cell $cell, int $playerNumber): bool
+    {
+        $startingCell = $this->getStartingCell($playerNumber);
+        return $cell->row === $startingCell->row && $cell->column && $startingCell->column;
     }
 
     /**
