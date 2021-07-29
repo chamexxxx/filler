@@ -113,91 +113,6 @@ class Field
     }
 
     /**
-     * Iterate over a cells, executing a function for each element.
-     *
-     * @param callable $callback
-     * @return void
-     */
-    public function each(callable $callback): void
-    {
-        foreach ($this->cells as $row) {
-            foreach ($row as $cell) {
-                call_user_func($callback, $cell);
-            }
-        }
-    }
-
-    /**
-     * Checks if all cells satisfy the condition given in the passed function.
-     *
-     * @param callable $callback
-     * @return bool
-     */
-    public function every(callable $callback): bool
-    {
-        foreach ($this->cells as $row) {
-            foreach ($row as $cell) {
-                if (!call_user_func($callback, $cell)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Convert all cells to a new array of elements by executing a function for each element.
-     *
-     * @param callable $callback
-     * @return array
-     */
-    public function map(callable $callback): array
-    {
-        $cells = [];
-
-        $this->each(function ($cell) use (&$cells, $callback) {
-            $cells[] = call_user_func($callback, $cell);
-        });
-
-        return $cells;
-    }
-
-    /**
-     * Convert all cells to array of elements.
-     *
-     * @param array|null $renamedProperties Properties for renaming
-     * @param array|null $additionalProperties Properties to add
-     * @return array
-     */
-    public function toArray(array $renamedProperties = null, array $additionalProperties = null): array
-    {
-        return $this->map(function ($cell) use ($renamedProperties, $additionalProperties) {
-            $item = [
-                'color' => $cell->color,
-                'player_id' => $cell->playerNumber,
-            ];
-
-            foreach ($renamedProperties as $oldKey => $newKey) {
-                if (array_key_exists($oldKey, $item)) {
-                    $item[$newKey] = $item[$oldKey];
-                    unset($item[$oldKey]);
-                }
-            }
-
-            if ($cell->id !== null) {
-                $item['id'] = $cell->id;
-            }
-
-            if ($additionalProperties) {
-                $item = array_merge($item, $additionalProperties);
-            }
-
-            return $item;
-        });
-    }
-
-    /**
      * Get cell.
      *
      * @param integer $row
@@ -233,7 +148,7 @@ class Field
         $numberOfSlotsForTheFirstPlayer = 0;
         $numberOfSlotsForTheSecondPlayer = 0;
 
-        $this->each(function ($cell) use (&$numberOfFreeSlots, &$numberOfSlotsForTheFirstPlayer, &$numberOfSlotsForTheSecondPlayer) {
+        CellIterator::each($this->cells, function ($cell) use (&$numberOfFreeSlots, &$numberOfSlotsForTheFirstPlayer, &$numberOfSlotsForTheSecondPlayer) {
             if ($cell->playerNumber === 1) {
                 $numberOfSlotsForTheFirstPlayer++;
             } else if ($cell->playerNumber === 2) {
@@ -265,13 +180,23 @@ class Field
     }
 
     /**
+     * Get a two-dimensional array of all cells in a field
+     *
+     * @return array
+     */
+    public function getCells(): array
+    {
+        return $this->cells;
+    }
+
+    /**
      * Print all cells.
      *
      * @return void
      */
     public function print()
     {
-        $this->each(function ($cell) {
+        CellIterator::each($this->cells, function ($cell) {
             echo $cell->color . " " . $cell->row . " " . $cell->column . "\n";
         });
     }
