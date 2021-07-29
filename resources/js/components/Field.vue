@@ -8,9 +8,11 @@
         <row
             v-for="(row, index) in rows"
             :key="index"
-            :cells="row"
             class="row"
             :class="{ 'even-row': (index + 1) % 2 === 0 }"
+            :cells="row"
+            :number="index + 1"
+            :last="index === rows.length - 1"
         />
     </div>
 </template>

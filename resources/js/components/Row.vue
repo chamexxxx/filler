@@ -1,6 +1,14 @@
 <template>
     <div class="d-flex">
-        <cell v-for="(cell, index) in cells" :key="index" v-bind="cell" />
+        <cell
+            v-for="(cell, index) in cells"
+            :key="index"
+            v-bind="cell"
+            :rowNumber="number"
+            :number="index + 1"
+            :rowLast="last"
+            :last="index === cells.length - 1"
+        />
     </div>
 </template>
 
@@ -14,7 +22,9 @@ export default {
         cells: {
             type: Array,
             required: true
-        }
+        },
+        number: Number,
+        last: Boolean
     }
 };
 </script>

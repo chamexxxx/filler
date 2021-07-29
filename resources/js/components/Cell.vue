@@ -1,12 +1,18 @@
 <template>
     <div
-        :class="`cell cell--${color}`"
+        :class="[
+            'cell',
+            color ? `cell--${color}` : '',
+            isStartingCell ? 'blinking' : ''
+        ]"
         v-on="$listeners"
         :style="$listeners.click && 'cursor: pointer'"
-    ></div>
+    >
+    </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { COLORS } from "../constants";
 
 export default {
@@ -18,6 +24,24 @@ export default {
             validator(val) {
                 return COLORS.includes(val);
             }
+        },
+        playerId: {
+            type: Number,
+            validator(val) {
+                return [0, 1, 2].includes(val);
+            }
+        },
+        rowNumber: Number,
+        number: Number,
+        rowLast: Boolean,
+        last: Boolean
+    },
+    computed: {
+        ...mapGetters(['game']),
+        isStartingCell() {
+            return (
+                (this.rowNumber === 1 && this.last) || (this.rowLast && this.number === 1)
+            ) && this.game.currentPlayerId === this.playerId;
         }
     },
 };
