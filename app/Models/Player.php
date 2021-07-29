@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Player extends BaseModel
 {
@@ -33,7 +33,7 @@ class Player extends BaseModel
     /**
      * Get the game that owns the player.
      */
-    public function post()
+    public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
     }

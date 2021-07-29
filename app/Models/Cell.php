@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Cell extends BaseModel
 {
@@ -26,8 +26,8 @@ class Cell extends BaseModel
     /**
      * Get the field that owns the cell.
      */
-    public function field()
+    public function field(): BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Field::class);
     }
 }

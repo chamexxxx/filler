@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int id
@@ -36,7 +37,7 @@ class Field extends BaseModel
     /**
      * Get the game that owns the field.
      */
-    public function game()
+    public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
     }
@@ -44,7 +45,7 @@ class Field extends BaseModel
     /**
      * Get the cells for the field.
      */
-    public function cells()
+    public function cells(): HasMany
     {
         return $this->hasMany(Cell::class);
     }
