@@ -7,7 +7,7 @@ use App\Models\Field;
 use App\Models\Player;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
-use App\Services\Filler\Field as Filler;
+use App\Services\Filler\Filler;
 use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
@@ -45,7 +45,7 @@ class GameController extends Controller
             ]),
         ]);
 
-        $cells = $filler->toArray(
+        $cells = $filler->field->toArray(
             ['playerNumber' => 'player_id'],
             ['field_id' => $field->id]
         );
@@ -102,7 +102,7 @@ class GameController extends Controller
             $game->winnerPlayerId = $filler->getWinner();
         }
 
-        $filler->each(function ($cell) {
+        $filler->field->each(function ($cell) {
             DB::table('cells')
                 ->where('id', $cell->id)
                 ->update([

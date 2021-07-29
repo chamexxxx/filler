@@ -13,6 +13,7 @@ class FieldTest extends TestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->field = new Field(7, 7);
+        $this->field->generate();
     }
 
     public function testFieldCount()

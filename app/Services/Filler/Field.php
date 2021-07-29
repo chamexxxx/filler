@@ -2,13 +2,16 @@
 
 namespace App\Services\Filler;
 
+/**
+ * Class for manipulating the playing field.
+ * @package App\Services\Filler
+ */
 class Field
 {
     public const COLORS = ['blue', 'green', 'cyan', 'red', 'magenta', 'yellow', 'white'];
 
     /**
-     * The main directions of the cells
-     * Opposites are indicated through one element
+     * The main directions of the cells, opposites are indicated through one element.
      */
     private const DIRECTIONS = ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'];
 
@@ -20,10 +23,8 @@ class Field
 
     private $startingPositions = [];
 
-    private $currentColors = [];
-
     /**
-     * Getting a random color
+     * Getting a random color.
      *
      * @param array|null $excludedColors
      * @return string
@@ -40,7 +41,7 @@ class Field
     }
 
     /**
-     * Getting the number of cells using the width and height of the field
+     * Getting the number of cells using the width and height of the field.
      *
      * @param integer $width
      * @param integer $height
@@ -55,7 +56,7 @@ class Field
     }
 
     /**
-     * Iterate cells by executing a function for each element using the width and height of the field
+     * Iterate cells by executing a function for each element using the width and height of the field.
      *
      * @param int $width
      * @param int $height
@@ -76,31 +77,43 @@ class Field
     }
 
     /**
-     * Field constructor
+     * Field constructor.
      *
      * @param integer $width
      * @param integer $height
-     * @param array|null $cells
      */
-    public function __construct(int $width, int $height, array $cells = null)
+    public function __construct(int $width, int $height)
     {
         $this->width = $width;
         $this->height = $height;
-
-        if ($cells) {
-            $this->fill($cells);
-            $this->initializeStartingPositions();
-        } else {
-            $this->initializeCells();
-            $this->initializeStartingPositions();
-            $this->generateClusters();
-        }
-
-        $this->initializeCurrentColors();
     }
 
     /**
-     * Iterate over a cells, executing a function for each element
+     * Fill the field with cells.
+     *
+     * @param $cells
+     * @return void
+     */
+    public function fill($cells): void
+    {
+        $this->fillCells($cells);
+        $this->initializeStartingPositions();
+    }
+
+    /**
+     * Generate field.
+     *
+     * @return void
+     */
+    public function generate(): void
+    {
+        $this->generateCells();
+        $this->initializeStartingPositions();
+        $this->generateClusters();
+    }
+
+    /**
+     * Iterate over a cells, executing a function for each element.
      *
      * @param callable $callback
      * @return void
@@ -115,7 +128,7 @@ class Field
     }
 
     /**
-     * Checks if all cells satisfy the condition given in the passed function
+     * Checks if all cells satisfy the condition given in the passed function.
      *
      * @param callable $callback
      * @return bool
@@ -134,7 +147,7 @@ class Field
     }
 
     /**
-     * Convert all cells to a new array of elements by executing a function for each element
+     * Convert all cells to a new array of elements by executing a function for each element.
      *
      * @param callable $callback
      * @return array
@@ -151,7 +164,7 @@ class Field
     }
 
     /**
-     * Convert all cells to array of elements
+     * Convert all cells to array of elements.
      *
      * @param array|null $renamedProperties Properties for renaming
      * @param array|null $additionalProperties Properties to add
@@ -185,7 +198,7 @@ class Field
     }
 
     /**
-     * Get cell
+     * Get cell.
      *
      * @param integer $row
      * @param integer $column
@@ -198,7 +211,7 @@ class Field
     }
 
     /**
-     * Get start cell
+     * Get start cell.
      *
      * @param integer $playerNumber
      * @return Cell|null
@@ -210,75 +223,49 @@ class Field
     }
 
     /**
-     * Get the current color
+     * Get the number of cells for each player.
      *
-     * @param integer $playerNumber
-     * @return string
+     * @return array
      */
-    public function getCurrentColor(int $playerNumber): string
+    public function getNumberOfCells(): array
     {
-        return $this->currentColors[$playerNumber - 1];
-    }
+        $numberOfFreeSlots = 0;
+        $numberOfSlotsForTheFirstPlayer = 0;
+        $numberOfSlotsForTheSecondPlayer = 0;
 
-    /**
-     * Checks if the game is over
-     *
-     * @return bool
-     */
-    public function isGameOver(): bool
-    {
-        return $this->every(function ($cell) {
-            return $cell->playerNumber !== 0;
-        });
-    }
-
-    /**
-     * Get the winner of the game for the current state of the field
-     *
-     * @return int
-     */
-    public function getWinner(): int
-    {
-        $numbers = $this->getNumberOfCells();
-
-        return $numbers[1] > $numbers[2] ? 1 : 2;
-    }
-
-    /**
-     * Make a move in the game
-     *
-     * @param string $color
-     * @param integer $playerNumber
-     * @return boolean
-     */
-    public function step(string $color, int $playerNumber): bool
-    {
-        if (!$this->isStepAllowed($color) || $this->isGameOver()) {
-            return false;
-        }
-
-        $startingCell = $this->getStartingCell($playerNumber);
-
-        $cluster = $this->getCluster($startingCell, function ($cell) use ($color, $playerNumber) {
-            if ($cell->color === $color) {
-                $cluster = $this->getCluster($cell);
-
-                foreach ($cluster as $cell) {
-                    $cell->playerNumber = $playerNumber;
-                }
+        $this->each(function ($cell) use (&$numberOfFreeSlots, &$numberOfSlotsForTheFirstPlayer, &$numberOfSlotsForTheSecondPlayer) {
+            if ($cell->playerNumber === 1) {
+                $numberOfSlotsForTheFirstPlayer++;
+            } else if ($cell->playerNumber === 2) {
+                $numberOfSlotsForTheSecondPlayer++;
+            } else {
+                $numberOfFreeSlots++;
             }
         });
 
-        foreach ($cluster as $cell) {
-            $cell->color = $color;
-            $cell->playerNumber = $playerNumber;
-        }
-
-        return true;
+        return [$numberOfFreeSlots, $numberOfSlotsForTheFirstPlayer, $numberOfSlotsForTheSecondPlayer];
     }
 
     /**
-     * Print all cells
+     * Get a group of cells merged with one color relative to a given cell.
+     *
+     * @param Cell $cell Cell relative to which the search will be conducted
+     * @param callable|null $extremeCallback Called when the outermost cells do not match the color
+     * @return array
+     */
+    public function getCluster(Cell $cell, callable $extremeCallback = null): array
+    {
+        $cells = [$cell];
+
+        $this->getAllNeighbors($cell, function ($cell) use (&$cells) {
+            $cells[] = $cell;
+        }, $extremeCallback);
+
+        return $cells;
+    }
+
+    /**
+     * Print all cells.
      *
      * @return void
      */
@@ -290,7 +277,7 @@ class Field
     }
 
     /**
-     * Fill the field with clusters by color
+     * Fill the field with clusters by color.
      *
      * @return void
      */
@@ -301,7 +288,7 @@ class Field
     }
 
     /**
-     * Recursive function of filling all clusters by color
+     * Recursive function of filling all clusters by color.
      *
      * @param Cell $cell
      * @param string $color
@@ -358,25 +345,7 @@ class Field
     }
 
     /**
-     * Get a group of cells merged with one color relative to a given cell
-     *
-     * @param Cell $cell Cell relative to which the search will be conducted
-     * @param callable|null $extremeCallback Called when the outermost cells do not match the color
-     * @return array
-     */
-    private function getCluster(Cell $cell, callable $extremeCallback = null): array
-    {
-        $cells = [$cell];
-
-        $this->getAllNeighbors($cell, function ($cell) use (&$cells) {
-            $cells[] = $cell;
-        }, $extremeCallback);
-
-        return $cells;
-    }
-
-    /**
-     * Recursive function of getting all neighbors of cells by color via callback functions
+     * Recursive function of getting all neighbors of cells by color via callback functions.
      *
      * @param Cell $cell Cell relative to which the search will be conducted
      * @param callable $callback Called when a neighbor is found
@@ -425,7 +394,7 @@ class Field
     }
 
     /**
-     * Check if a cell exists in an array
+     * Check if a cell exists in an array.
      *
      * @param Cell $cell
      * @param array $cells
@@ -443,7 +412,7 @@ class Field
     }
 
     /**
-     * Get the neighbor of a cell in a given direction
+     * Get the neighbor of a cell in a given direction.
      *
      * @param Cell $cell
      * @param string $direction
@@ -455,7 +424,7 @@ class Field
     }
 
     /**
-     * Get all directions except the opposite
+     * Get all directions except the opposite.
      *
      * @param string $direction
      * @return array
@@ -470,7 +439,7 @@ class Field
     }
 
     /**
-     * Get the index of the opposite direction
+     * Get the index of the opposite direction.
      *
      * @param string $direction
      * @return integer
@@ -484,7 +453,7 @@ class Field
     }
 
     /**
-     * Get the normalized index
+     * Get the normalized index.
      *
      * @param integer $index
      * @param integer $arrayLength
@@ -496,47 +465,12 @@ class Field
     }
 
     /**
-     * Check if it is allowed to make a move in the game
-     *
-     * @param string $color
-     * @return boolean
-     */
-    private function isStepAllowed(string $color): bool
-    {
-        return !in_array($color, $this->currentColors);
-    }
-
-    /**
-     * Get the number of cells for each player
-     *
-     * @return array
-     */
-    private function getNumberOfCells(): array
-    {
-        $numberOfFreeSlots = 0;
-        $numberOfSlotsForTheFirstPlayer = 0;
-        $numberOfSlotsForTheSecondPlayer = 0;
-
-        $this->each(function ($cell) use (&$numberOfFreeSlots, &$numberOfSlotsForTheFirstPlayer, &$numberOfSlotsForTheSecondPlayer) {
-            if ($cell->playerNumber === 1) {
-                $numberOfSlotsForTheFirstPlayer++;
-            } else if ($cell->playerNumber === 2) {
-                $numberOfSlotsForTheSecondPlayer++;
-            } else {
-                $numberOfFreeSlots++;
-            }
-        });
-
-        return [$numberOfFreeSlots, $numberOfSlotsForTheFirstPlayer, $numberOfSlotsForTheSecondPlayer];
-    }
-
-    /**
-     * Fill cells from an array
+     * Fill cells from an array.
      *
      * @param array $cells
      * @return void
      */
-    private function fill(array $cells): void
+    private function fillCells(array $cells): void
     {
         self::iterate($this->width, $this->height, function ($row, $column, $index) use ($cells) {
             $item = $cells[$index];
@@ -552,7 +486,12 @@ class Field
         });
     }
 
-    private function initializeCells()
+    /**
+     * Fills cells without colors.
+     *
+     * @return void
+     */
+    private function generateCells(): void
     {
         self::iterate($this->width, $this->height, function ($row, $column) {
             $this->cells[$row][$column] = new Cell($this, $row, $column, 0);
@@ -560,7 +499,7 @@ class Field
     }
 
     /**
-     * Initialize the starting positions of the cells
+     * Initialize the starting positions of the cells.
      *
      * @return void
      */
@@ -580,7 +519,7 @@ class Field
     }
 
     /**
-     * Checks if the cell is the starting cell for the player
+     * Checks if the cell is the starting cell for the player.
      *
      * @param Cell $cell
      * @param int $playerNumber
@@ -593,32 +532,7 @@ class Field
     }
 
     /**
-     * Set current colors
-     *
-     * @param string $firstColor
-     * @param string $secondColor
-     * @return void
-     */
-    private function setCurrentColors(string $firstColor, string $secondColor): void
-    {
-        array_push($this->currentColors, $firstColor, $secondColor);
-    }
-
-    /**
-     * Initialize current colors with start cells
-     *
-     * @return void
-     */
-    private function initializeCurrentColors(): void
-    {
-        $this->setCurrentColors(
-            $this->getStartingCell(1)->color,
-            $this->getStartingCell(2)->color,
-        );
-    }
-
-    /**
-     * Cell validation
+     * Cell validation.
      *
      * @param integer $row
      * @param integer $column

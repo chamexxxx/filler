@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\BaseModel;
 use App\Models\Concerns\UsesUUID;
 
+/**
+ * @property string id
+ * @property object field
+ * @property int winnerPlayerId
+ * @property int currentPlayerId
+ */
 class Game extends BaseModel
 {
     use HasFactory, UsesUUID;

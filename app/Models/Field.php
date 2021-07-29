@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\BaseModel;
 
+/**
+ * @property int id
+ */
 class Field extends BaseModel
 {
     use HasFactory;
