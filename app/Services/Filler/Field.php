@@ -110,6 +110,7 @@ class Field
         $this->generateCells();
         $this->initializeStartingPositions();
         $this->generateClusters();
+        $this->initializeStartingCells();
     }
 
     /**
@@ -213,6 +214,29 @@ class Field
     }
 
     /**
+     * Indicate the player's number and the correct color in the starting cells.
+     *
+     * @return void
+     */
+    private function initializeStartingCells(): void
+    {
+        $firstStartingCell = $this->getStartingCell(1);
+        $secondStartingCell = $this->getStartingCell(2);
+
+        $firstNeighborColor = $firstStartingCell->getTopRightCell()->color;
+        $secondNeighborColor = $secondStartingCell->getBottomLeftCell()->color;
+
+        $firstColor = self::getRandomColor([$firstNeighborColor]);
+        $secondColor = self::getRandomColor([$secondNeighborColor, $firstColor]);
+
+        $firstStartingCell->playerNumber = 1;
+        $secondStartingCell->playerNumber = 2;
+
+        $firstStartingCell->color = $firstColor;
+        $secondStartingCell->color = $secondColor;
+    }
+
+    /**
      * Recursive function of filling all clusters by color.
      *
      * @param Cell $cell
@@ -237,18 +261,9 @@ class Field
             }
         }
 
-        $exceeded = $number > $limit;
-
-        if ($exceeded) {
+        if ($number > $limit) {
             $number = 1;
             $limit = rand(5, 7);
-        }
-
-        if ($this->isStartingCell($cell, 2)) {
-            $color = $exceeded ?
-                self::getRandomColor([$this->getStartingCell(1)->color, $color]) :
-                self::getRandomColor([$this->getStartingCell(1)->color]);
-        } else if ($exceeded) {
             $color = self::getRandomColor([$color]);
         }
 
