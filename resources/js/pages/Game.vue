@@ -2,7 +2,7 @@
     <div class="position-relative d-flex flex-column justify-content-center align-items-center min-vh-100 min-vw-100 bg-dark-image">
         <div>
             <span
-                v-if="isLoading"
+                v-if="loadingStatus"
                 class="spinner-grow spinner-grow-sm text-light"
                 role="status"
                 aria-hidden="true"
@@ -32,50 +32,31 @@
                 <div :class="`bottom-left-triangle bottom-left-triangle--${getPlayerColor(1)}`"></div>
                 <div :class="`top-right-triangle top-right-triangle--${getPlayerColor(2)}`"></div>
             </template>
-            <span
-                v-else
-                class="spinner-grow spinner-grow-sm text-light"
-                role="status"
-                aria-hidden="true"
-            ></span>
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import ControlPanel from "../components/ControlPanel.vue";
 import Field from "../components/Field.vue";
 
 export default {
     name: "Game",
     components: { ControlPanel, Field },
-    data() {
-        return {
-            gameData: null,
-            isLoading: false
-        };
-    },
     methods: {
+        ...mapActions(['updateGame', 'fetchGame']),
         onSelected(color, playerId) {
-            this.updateGame(color, playerId).then(this.fetchGameData);
-        },
-        updateGame(color, playerId) {
-            return axios.patch(`api/game/${this.gameId}`, { color, playerId })
-        },
-        fetchGameData() {
-            return axios
-                .get(`api/game/${this.gameId}`)
-                .then(response => {
-                    this.gameData = response.data;
-                })
+            this.updateGame({ color, playerId, id: this.gameId, loading: false })
+                .then(() => this.fetchGame({ id: this.gameId, loading: false }));
         },
         getPlayerColor(playerId) {
-          return this.gameData ? this.gameData.players.find(({ id }) => id === playerId).color : null;
+          return this.game.players ? this.game.players.find(({ id }) => id === playerId).color : null;
         },
         getPlayerPercentage(playerId) {
-            if (!this.gameData) return null;
+            if (!this.game.field) return null;
 
-            const { cells } = this.gameData.field;
+            const { cells } = this.game.field;
 
             const count = cells.reduce((count, cell) => {
                 if (cell.playerId === playerId) count++;
@@ -87,21 +68,22 @@ export default {
         }
     },
     computed: {
+        ...mapGetters(['game', 'loadingStatus']),
         gameId() {
             return this.$route.params.gameId;
         },
         isGameOver() {
-          return this.gameData && this.gameData.currentPlayerId === 0;
+          return this.game.currentPlayerId === 0;
         },
         winnerPlayerId() {
-            return this.gameData && this.gameData.winnerPlayerId;
+            return this.game.winnerPlayerId;
         },
         rows() {
-            if (!this.gameData) return [];
+            if (!this.game.field) return [];
 
             const rows = [];
 
-            const { field } = this.gameData;
+            const { field } = this.game;
             const { width: fieldWidth, height: fieldHeight, cells } = field;
 
             for (let row = 1; row <= fieldHeight; row++) {
@@ -126,8 +108,7 @@ export default {
         },
     },
     created() {
-        this.isLoading = true;
-        this.fetchGameData().finally(() => this.isLoading = false);
+        this.fetchGame({ id: this.gameId });
     }
 };
 </script>

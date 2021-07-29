@@ -10,9 +10,9 @@
                     @click="onStarted"
                     class="btn btn-primary btn-lg mt-4 mb-3"
                     type="button"
-                    :disabled="isLoading"
+                    :disabled="loadingStatus"
                 >
-                    <div v-if="isLoading" class="flex items-center">
+                    <div v-if="loadingStatus" class="flex items-center">
                         <span
                             class="spinner-grow spinner-grow-sm mr-2"
                             role="status"
@@ -28,30 +28,19 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import Description from "../components/Description.vue";
 
 export default {
     name: "Start",
     components: { Description },
-    data() {
-        return {
-            isLoading: false
-        };
-    },
     methods: {
+        ...mapActions(['createGame']),
         onStarted() {
-            this.createGame(15, 15).then(response => {
-                const { id } = response.data;
-                this.$router.push({ name: "Game", params: { gameId: id } });
-            });
+            this.createGame({ width: 15, height: 15 })
+                .then(id => this.$router.push({ name: "Game", params: { gameId: id } }));
         },
-        createGame(width, height) {
-            this.isLoading = true;
-
-            return axios
-                .post("api/game", { width, height })
-                .finally(() => (this.isLoading = false));
-        }
-    }
+    },
+    computed: mapGetters(['loadingStatus'])
 };
 </script>
