@@ -27,3 +27,19 @@
 .bg-dark-image {
     background: url('/img/bg-dark-4800.png')
 }
+
+@keyframes blinking {
+    from {
+        opacity: 1;
+        visibility: visible;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+}
+
+.blinking {
+    animation: blinking .27s ease-out -2s infinite alternate forwards;
+}
