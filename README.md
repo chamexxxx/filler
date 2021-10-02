@@ -4,6 +4,15 @@
 
 ![game image preview](./preview.png)
 
+## Overview
+
+- [`app/Services/Filler`](app/Services/Filler) - Contains the main game logic files
+- [`app/Models`](app/Models) - Contains all the Eloquent models
+- [`app/Http/Controllers/GameController.php`](app/Http/Controllers/GameController.php) - Contains the main game controller
+- [`database/migrations`](database/migrations) - Contains all the database migrations
+- [`routes`](routes) - Contains all api routes defined in [api.php](routes/api.php) file and web routes in [web.php](routes/web.php) file containing entry point for ui
+- [`tests`](tests) - Contains all the application feature tests in [Feature/GameTest.php](tests/Feature/GameTest.php) file and unit tests in [Unit/FieldTest.php](tests/Unit/FieldTest.php)
+
 ## Installation
 
 Please check the official laravel installation guide for server requirements before you start.
